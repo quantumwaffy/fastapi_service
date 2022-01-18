@@ -1,10 +1,10 @@
-from core.enums import EnumChoices
+from enum import Enum
 
 
-class Cities(EnumChoices):
-    GOMEL = "gomel"
-    BREST = "brest"
-    VITEBSK = "vitebsk"
-    MOGILEV = "mogilev"
-    MINSK = "minsk"
-    GRODNO = "grodno"
+class Cities(str, Enum):
+    gomel = "gomel"
+    brest = "brest"
+    vitebsk = "vitebsk"
+    mogilev = "mogilev"
+    minsk = "minsk"
+    grodno = "grodno"

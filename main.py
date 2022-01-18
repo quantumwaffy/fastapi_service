@@ -19,9 +19,9 @@ async def root():
 
 
 @app.get("/currency/get-bank-in-city/{bank_name}/{city_name}")
-async def get_bank_by_city(bank_name: str, city_name: str):
+async def get_bank_by_city(bank_name: str, city_name: consts.Cities):
     try:
-        pyd_obj_dict = schemas.pyd_bank_by_city(bank_name=bank_name, city_name=city_name).dict()
+        pyd_obj_dict = schemas.pyd_bank_by_city(bank_name=bank_name, city_name=city_name.value).dict()
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     if not models.BankCurrency.filter(**pyd_obj_dict).exists():
@@ -31,14 +31,12 @@ async def get_bank_by_city(bank_name: str, city_name: str):
 
 
 @app.get("/currency/get-best-usd-sell/{city_name}")
-async def get_best_usd_by_city(city_name: str):
-    if city_name not in consts.Cities.choices:
-        raise HTTPException(status_code=404, detail=f"City not found. Choices are '{' ,'.join(consts.Cities.choices)}'")
+async def get_best_usd_by_city(city_name: consts.Cities):
     max_value_dict = (
-        await models.BankCurrency.filter(city_name=city_name)
+        await models.BankCurrency.filter(city_name=city_name.value)
         .annotate(max_value=Max("usd_sell"))
         .first()
         .values("max_value")
     )
-    object_list = models.BankCurrency.filter(city_name=city_name, usd_sell=max_value_dict.get("max_value"))
+    object_list = models.BankCurrency.filter(city_name=city_name.value, usd_sell=max_value_dict.get("max_value"))
     return await schemas.pyd_bank_currency.from_queryset(object_list)
